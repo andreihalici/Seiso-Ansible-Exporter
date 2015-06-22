@@ -1,0 +1,82 @@
+- name: Onboard all services to Seiso
+  hosts: clients
+  sudo: True
+  vars_files:
+    - seiso_vars.yml
+  tasks:
+    - name: install the latest version of python-setuptools (needed to install httplib2)
+      yum: name=python-setuptools state=latest
+
+    - name: Install on the target machines
+      easy_install: name=httplib2
+
+    - name: Adding status types
+      with_items: "{{ seiso_status_types }}"
+      uri:
+        url: "{{ seiso_url}}/v1/status-types/{{ item.seiso_key }}"
+        method: PUT
+        force_basic_auth: yes
+        user: seiso-user
+        password: seiso
+        HEADER_Content-Type: "application/json"
+        HEADER_Accept: "application/json"
+        status_code: 204,409,500
+        body_format: json
+        body: " {\n    \"key\": \"{{ item.seiso_key }}\",\n    \"name\": \"{{ item.seiso_name }}\",\n    \"_hack\": null\n }"
+
+    - name: Adding rotation statuses
+      with_items: "{{ seiso_rotation_statuses }}"
+      uri:
+        url: "{{ seiso_url}}/v1/rotation-statuses/{{ item.seiso_key }}"
+        method: PUT
+        force_basic_auth: yes
+        user: seiso-user
+        password: seiso
+        HEADER_Content-Type: "application/json"
+        HEADER_Accept: "application/json"
+        status_code: 204,409,400
+        body_format: json
+        body: "{\n    \"key\": \"{{ item.seiso_key }}\",\n    \"name\": \"{{ item.seiso_name }}\",\n    \"statusType\": {\n        \"key\": \"{{ item.seiso_statusType.seiso_statusType_key }}\",\n        \"_hack\": null\n    },\n    \"_hack\": null\n}"
+
+    - name: Adding service types
+      with_items: "{{ seiso_service_types }}"
+      uri:
+        url: "{{ seiso_url}}/v1/service-types/{{ item.seiso_key }}"
+        method: PUT
+        force_basic_auth: yes
+        user: seiso-user
+        password: seiso
+        HEADER_Content-Type: "application/json"
+        HEADER_Accept: "application/json"
+        status_code: 204,409,500
+        body_format: json
+        body: " {\n    \"key\": \"{{ item.seiso_key }}\",\n    \"description\": \"{{ item.seiso_description }}\",\n    \"name\": \"{{ item.seiso_name }}\",\n    \"_hack\": null\n }"
+
+    - name: Adding service groups
+      with_items: "{{ seiso_service_groups }}"
+      uri:
+        url: "{{ seiso_url}}/v1/service-groups/{{ item.seiso_key }}"
+        method: PUT
+        force_basic_auth: yes
+        user: seiso-user
+        password: seiso
+        HEADER_Content-Type: "application/json"
+        HEADER_Accept: "application/json"
+        status_code: 204,400,409
+        body_format: json
+        body: "{\n  \"key\": \"{{ item.seiso_key }}\",\n  \"description\": \"{{ item.seiso_description }}\",\n  \"name\": \"{{ item.seiso_name }}\",\n  \"_hack\": null\n}\n"
+
+    - name: Adding services
+      with_items: "{{ seiso_services }}"
+      uri:
+        url: "{{ seiso_url}}/v1/services/{{ item.seiso_key }}"
+        method: PUT
+        force_basic_auth: yes
+        user: seiso-user
+        password: seiso
+        HEADER_Content-Type: "application/json"
+        HEADER_Accept: "application/json"
+        status_code: 400,500,204,409
+        body_format: json
+        # Adding extra null key ( https://github.com/ansible/ansible/issues/9472 )
+        body: "{\n    \"description\": \"{{ item.seiso_description }}\",\n    \"group\": {\n        \"description\": \"{{ item.seiso_group.seiso_description }}\",\n        \"key\": \"{{ item.seiso_group.seiso_key }}\",\n        \"name\": \"{{ item.seiso_group.seiso_name }}\",\n        \"_hack\": null\n    },\n    \"key\": \"{{ item.seiso_key }}\",\n    \"name\": \"{{ item.seiso_name }}\",\n    \"owner\": {\n        \"company\": \"{{ item.seiso_owner.seiso_company }}\",\n        \"department\": \"{{ item.seiso_owner.seiso_department }}\",\n        \"division\": \"{{ item.seiso_owner.seiso_division }}\",\n        \"email\": \"{{ item.seiso_owner.seiso_email }}\",\n        \"firstName\": \"{{ item.seiso_owner.seiso_firstName }}\",\n        \"lastName\": \"{{ item.seiso_owner.seiso_lastName }}\",\n        \"ldapDn\": \"{{ item.seiso_owner.seiso_ldapDn }}\",\n        \"location\": \"{{ item.seiso_owner.seiso_location }}\",\n        \"mbType\": \"{{ item.seiso_owner.seiso_mbType }}\",\n        \"streetAddress\": \"{{ item.seiso_owner.seiso_streetAddress }}\",\n        \"subdivision\": \"{{ item.seiso_owner.seiso_subdivision }}\",\n        \"title\": \"{{ item.seiso_owner.seiso_title }}\",\n        \"username\": \"{{ item.seiso_owner.seiso_username }}\",\n        \"workPhone\": \"{{ item.seiso_owner.seiso_workPhone }}\",\n        \"_hack\": null\n    },\n    \"platform\": \"{{ item.seiso_platform }}\",\n    \"scmRepository\": \"{{ item.seiso_scmRepository }}\",\n    \"type\": {\n        \"description\": \"{{ item.seiso_type.seiso_description }}\",\n        \"key\": \"{{ item.seiso_type.seiso_key }}\",\n        \"name\": \"{{ item.seiso_type.seiso_name }}\",\n        \"_hack\": null\n    }\n}"

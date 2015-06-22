@@ -1,0 +1,70 @@
+---
+seiso_url: http://seiso.local.instance.com:8080
+seiso_project_description: Seido data for your service
+
+# Define the status types
+seiso_status_types:
+  - seiso_key: destroyed
+    seiso_name: Destroyed
+  - seiso_key: default
+    seiso_name: Default
+
+# Define the rotation statuses (please make sure that the statusType matches an existing seiso_status_types key)
+seiso_rotation_statuses:
+  - seiso_key: enabled
+    seiso_name: Enabled
+    seiso_statusType:
+      seiso_statusType_key: success
+  - seiso_key: disabled
+    seiso_name: Disabled
+    seiso_statusType:
+      seiso_statusType_key: warning
+
+# Define the service types
+seiso_service_types:
+  - seiso_key: app
+    seiso_name: Application
+    seiso_description: A service that the client uses
+  - seiso_key: jenkins-service
+    seiso_name: Jenkins Service
+    seiso_description: A Jenkins service that the client uses
+
+# Define the seiso groups
+seiso_service_groups:
+  - seiso_key: abc
+    seiso_name: Abc Service Group
+    seiso_description: Abc Service Group description
+  - seiso_key: def
+    seiso_name: Def Service Group
+    seiso_description: Def Service Group description
+
+# Define the seiso services
+seiso_services:
+  - seiso_key: test-service
+    seiso_description: UI + REST API for test-service
+    seiso_group:
+      seiso_description: test-service description
+      seiso_key: test-service
+      seiso_name: Test-service
+    seiso_name: test-service Name
+    seiso_owner:
+      seiso_company: Example.com
+      seiso_department: null
+      seiso_division: null
+      seiso_email: example@example.com
+      seiso_firstName: Jon
+      seiso_lastName: Smith
+      seiso_ldapDn: null
+      seiso_location: null
+      seiso_mbType: null
+      seiso_streetAddress: null
+      seiso_subdivision: null
+      seiso_title: Software Engineer
+      seiso_username: jsmith
+      seiso_workPhone: null
+    seiso_platform: Python
+    seiso_scmRepository: http://github.example.com/test-service
+    seiso_type:
+      seiso_description: UI + API
+      seiso_key: ui-api
+      seiso_name: UI + API
